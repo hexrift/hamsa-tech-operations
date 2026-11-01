@@ -8,6 +8,14 @@ test('shows the newest source run, regardless of API array order',() => {
   const other={event:'pull_request',created_at:'2026-10-22T10:00:00Z',html_url:'https://github.com/other'};
   assert.equal(latestRun({workflow_runs:[old,other,recent]},'push'),recent);
 });
+test('platform signals stay on the main release and hosted browser workflows',() => {
+  const main={event:'push',head_branch:'main',path:'hexrift/meridian-vale-platform/.github/workflows/ci.yml',created_at:'2026-11-01T10:00:00Z',html_url:'https://github.com/main'};
+  const branch={...main,head_branch:'feature',created_at:'2026-11-01T11:00:00Z',html_url:'https://github.com/branch'};
+  assert.equal(latestRun({workflow_runs:[branch,main]},'push',sources[1]),main);
+  const hosted={event:'workflow_dispatch',path:'hexrift/meridian-vale-platform/.github/workflows/browser-journey.yml',created_at:'2026-11-01T10:00:00Z',html_url:'https://github.com/hosted'};
+  const other={...hosted,path:'hexrift/meridian-vale-platform/.github/workflows/other.yml',created_at:'2026-11-01T11:00:00Z',html_url:'https://github.com/other'};
+  assert.equal(latestRun({workflow_runs:[other,hosted]},'workflow_dispatch',sources[2]),hosted);
+});
 test('distinguishes a passed check from a failed or pending check',() => {
   assert.equal(runSignal({status:'completed',conclusion:'success'}).label,'Check passed');
   assert.equal(runSignal({status:'completed',conclusion:'failure'}).label,'Check failed');
@@ -19,6 +27,6 @@ test('only displays a plausible commit prefix',() => {
 });
 test('all signals come from the Meridian Vale staging repository',() => {
   assert.equal(sources.length,3);
-  assert.equal(repository,'hexrift/hamsa-tech-operations');
+  assert.equal(repository,'hexrift/meridian-vale-platform');
   assert.deepEqual(sources.map(source=>source.event),['pull_request','push','workflow_dispatch']);
 });
