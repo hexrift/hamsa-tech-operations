@@ -4,4 +4,4 @@ A Meridian Vale logistics customer portal in a controlled Hamsa-owned staging en
 
 Run `npm ci && npm test && npm run build && npm run serve`, then open `http://127.0.0.1:4173/`. Run `npm run check:browser` to verify the rendered page in Chrome. Set `CHROME_BIN` if Chrome is not on the system path.
 
-The `CI and staging` workflow tests and builds the site, then deploys the same artifact to GitHub Pages on `main`. The post-deployment browser journey checks whether `MV-4821` renders its destination and milestones. See [the incident-channel contract](docs/incident-channel.md) for operational alerts; AI Institution holds the authoritative decisions and evidence.
+The `CI and staging` workflow runs unit tests, builds the site, verifies shipment `MV-4821` in Chrome against the built artifact, and only then deploys that artifact to GitHub Pages on `main`. The separate `Staging browser journey` workflow checks the hosted URL and uploads its rendered evidence. See [the incident-channel contract](docs/incident-channel.md) for operational alerts; AI Institution holds the authoritative decisions and evidence.
