@@ -23,6 +23,22 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+      - name: Verify rendered shipment tracking
+        run: |
+          node scripts/serve.mjs > /tmp/meridian-staging-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..20}; do
+            if curl --fail --silent --output /dev/null http://127.0.0.1:4173/; then break; fi
+            sleep 0.25
+          done
+          npm run check:browser
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-journey-evidence
+          path: browser-check/
+          if-no-files-found: ignore
       - uses: actions/upload-artifact@v4
         with:
           name: staging-site
