@@ -6,7 +6,7 @@ import {dirname,join,resolve} from 'node:path';
 const root = resolve(dirname(fileURLToPath(import.meta.url)),'..');
 const dist = join(root,'dist');
 mkdirSync(join(dist,'assets'),{recursive:true});
-for (const file of ['index.html','operations.html','styles.css','app.js','operations.js']) cpSync(join(root,file),join(dist,file));
+for (const file of ['index.html','operations.html','styles.css','app.js','operations.js','favicon.svg']) cpSync(join(root,file),join(dist,file));
 cpSync(join(root,'lib'),join(dist,'lib'),{recursive:true});
 cpSync(join(root,'data'),join(dist,'data'),{recursive:true});
 for (const file of ['serif.woff2','serif-italic.woff2','sans.woff2','inter-LICENSE.txt','instrument-serif-LICENSE.txt']) cpSync(join(root,'assets',file),join(dist,'assets',file));
