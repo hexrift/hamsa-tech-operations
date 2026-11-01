@@ -1,0 +1,20 @@
+import {spawnSync} from 'node:child_process';
+import {mkdirSync,writeFileSync} from 'node:fs';
+import {resolve} from 'node:path';
+
+const url=process.env.SITE_URL ?? 'http://127.0.0.1:4173/?ref=MV-4821';
+const chrome=process.env.CHROME_BIN ?? 'google-chrome';
+const result=spawnSync(chrome,['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--disable-background-networking','--virtual-time-budget=18000','--dump-dom',url],{encoding:'utf8',timeout:35000,maxBuffer:5*1024*1024});
+const evidence=resolve('browser-check');
+mkdirSync(evidence,{recursive:true});
+writeFileSync(resolve(evidence,'rendered.html'),result.stdout ?? '');
+writeFileSync(resolve(evidence,'chrome-stderr.txt'),result.stderr ?? '');
+const rendered=result.stdout ?? '';
+const complete=/data-tracking-state="ready"/.test(rendered);
+const hasReference=/data-shipment-reference="MV-4821"/.test(rendered);
+const hasDestination=rendered.includes('Rotterdam, NL');
+const passed=result.status===0 && complete && hasReference && hasDestination;
+const receipt={url,checkedAt:new Date().toISOString(),passed,rendered:complete,shipmentReference:hasReference?'MV-4821':null,destinationVisible:hasDestination,chromeExit:result.status,error:result.error?.message ?? null};
+writeFileSync(resolve(evidence,'receipt.json'),JSON.stringify(receipt,null,2)+'\n');
+console.log(JSON.stringify(receipt));
+if (!passed) process.exitCode=1;

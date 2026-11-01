@@ -1,0 +1,1 @@
+{"name":"hamsa-tech-operations","version":"1.0.0","private":true,"type":"module","scripts":{"test":"node --test","build":"node scripts/build.mjs","serve":"node scripts/serve.mjs","check:browser":"node scripts/browser-check.mjs"},"engines":{"node":">=20"}}
