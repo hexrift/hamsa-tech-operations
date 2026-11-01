@@ -1,7 +1,8 @@
 import {repository,sources,latestRun,runSignal,shortCommit} from './lib/status.mjs';
 const grid=document.querySelector('[data-operations-grid]');
 const refreshed=document.querySelector('[data-refreshed-at]');
-const revision=document.querySelector('[data-revision]');
+const revision=[...document.querySelectorAll('[data-revision]')];
+const refreshButton=document.querySelector('[data-refresh-signals]');
 function element(tag,className,content){const node=document.createElement(tag);if(className)node.className=className;if(content!==undefined)node.textContent=content;return node;}
 function card(source,run,unavailable){
   const article=element('article','signal-card');article.dataset.sourceCard=source.event;
@@ -14,10 +15,16 @@ function card(source,run,unavailable){
   return article;
 }
 async function start(){
-  try{const response=await fetch('./build.json',{cache:'no-store'});const build=await response.json();revision.textContent=typeof build.commit==='string'?build.commit.slice(0,7):'unavailable';}catch{revision.textContent='unavailable';}
+  refreshButton.disabled=true;
+  refreshed.textContent='Connecting to GitHub…';
+  let currentRevision='unavailable';
+  try{const response=await fetch('./build.json',{cache:'no-store'});if(!response.ok)throw new Error('build unavailable');const build=await response.json();currentRevision=typeof build.commit==='string'?build.commit.slice(0,7):'unavailable';}catch{}
+  for(const target of revision)target.textContent=currentRevision;
   let runs=null;
   try{const response=await fetch(`https://api.github.com/repos/${repository}/actions/runs?per_page=50`,{headers:{Accept:'application/vnd.github+json'}});if(response.ok)runs=await response.json();}catch{}
-  grid.replaceChildren(...sources.map(source=>card(source,runs?latestRun(runs,source.event):null,runs===null)));
+  grid.replaceChildren(...sources.map(source=>card(source,runs?latestRun(runs,source.event,source):null,runs===null)));
   grid.dataset.pulseState='complete';refreshed.textContent=`Observed ${new Date().toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'})}`;
+  refreshButton.disabled=false;
 }
+refreshButton.addEventListener('click',start);
 start();

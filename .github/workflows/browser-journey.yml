@@ -1,6 +1,15 @@
 name: Staging browser journey
 on:
   workflow_dispatch:
+    inputs:
+      reference:
+        description: Shipment reference to verify on the hosted site
+        required: true
+        type: choice
+        options:
+          - MV-4821
+          - MV-6158
+        default: MV-4821
 permissions:
   contents: read
 jobs:
@@ -16,7 +25,8 @@ jobs:
       - run: google-chrome --version
       - run: npm run check:browser
         env:
-          SITE_URL: https://hexrift.github.io/hamsa-tech-operations/?ref=MV-4821
+          CHECK_REFERENCE: ${{ inputs.reference }}
+          SITE_URL: https://hexrift.github.io/meridian-vale-platform/?ref=${{ inputs.reference }}
       - if: always()
         uses: actions/upload-artifact@v4
         with:
