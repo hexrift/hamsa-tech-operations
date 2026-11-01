@@ -1,0 +1,24 @@
+name: Staging browser journey
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify-browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: google-chrome --version
+      - run: npm run check:browser
+        env:
+          SITE_URL: https://hexrift.github.io/hamsa-tech-operations/?ref=MV-4821
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-browser-evidence
+          path: browser-check/
