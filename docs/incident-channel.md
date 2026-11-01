@@ -1,13 +1,15 @@
-# Staging incident channel contract
+# Staging incident coordination
 
-Channel: `#tech-incidents-staging` in the Hamsasoftware workspace. This is a private staging coordination channel. AI Institution holds the authoritative incident record, role decisions, approvals, and verification receipts.
+The Hamsasoftware workspace has a private `#tech-incidents-staging` channel for Meridian Vale staging operations. AI Institution holds the role-governed Mission, source evidence, decisions, and verification receipts. Slack receives notifications from the Institution; it is not the incident record.
 
-## Notification
+## Connected notification path
 
-Send an alert only when the **deployed Meridian Vale staging URL** fails the shipment-tracking browser check, not when a CI result alone is red. The business symptom is that a customer cannot retrieve delivery milestones for a known shipment reference. The message should include the staging URL, browser-check result, deployment run URL, deployed commit, observed time, incident record link, incident commander, and the next verification step. Do not post secrets, request headers, credentials, or private repository content.
+The Institution's native Slack connector sends pending approval and Mission outcome notifications to the channel configured by `SLACK_APPROVAL_CHANNEL`. Its bot credential is supplied as `SLACK_BOT_TOKEN` through the runtime's secret configuration, never through this repository. The bot must be invited to the private channel with permission to post.
 
-## Connection
+This path was verified on 1 November 2026: the Institution certified its Meridian Vale staging diagnosis Mission, and the AI Institution Incidents bot delivered the corresponding “Mission certified” notification to `#tech-incidents-staging`. The source Mission ID is `mission-f6dc838a-e2ce-42b4-bc61-d76c271419f3`; the channel message timestamp is `1793574668.228699`. The Mission links the governed GitHub pull-request read to its certification. The notification does not assert a customer production outage.
 
-The Institution runtime needs `SLACK_BOT_TOKEN` and `SLACK_OPERATIONS_CHANNEL` supplied through local or hosted secret configuration. For this staging channel the channel ID is `C0CDTP66D61`. The bot must be invited to the private channel and have the Slack scope necessary to post messages. A channel existing by itself does not prove delivery; record a successful Slack message timestamp and channel ID before describing the integration as live.
+## Staging health signal
 
-The workflow is: browser check records a failure → Institution incident commander opens or updates the incident → an authorized operator sends a source-linked alert → experts diagnose and approve a recovery → browser check verifies the deployed result → Institution records closure. Slack is an operational notification surface, not the source of truth.
+The separate [Staging browser journey](https://github.com/hexrift/hamsa-tech-operations/actions/workflows/staging-browser.yml) checks the **deployed** shipment-tracking page in Chrome. The controlled regression produced a [failed browser run](https://github.com/hexrift/hamsa-tech-operations/actions/runs/41359725233) after a passing deployment. The [recovery deployment](https://github.com/hexrift/hamsa-tech-operations/actions/runs/41360269148) and [hosted browser verification](https://github.com/hexrift/hamsa-tech-operations/actions/runs/41360615324) passed after the marker fix and release gate landed.
+
+The browser workflow does not automatically post an app-health alert through the Institution's Slack connector. An operator initiated the governed diagnosis Mission from the observed failure; the native connector then delivered its outcome. A future automatic incident alert must include the deployed URL, failed browser result, deployment revision, time, and Institution incident record, and must be verified end to end before it is described as active.
