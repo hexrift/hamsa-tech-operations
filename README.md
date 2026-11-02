@@ -20,7 +20,7 @@ npm run build
 npm run serve
 ```
 
-Open `http://127.0.0.1:4173/`. In another terminal, run `npm run check:browser`. Set `CHROME_BIN` if Chrome is not on the default path. The browser check writes its rendered DOM and receipt to `browser-check/`. The hosted workflow accepts a constrained `MV-4821` or `MV-6158` reference input; the local CI gate remains pinned to `MV-4821` until shipment coverage is deliberately expanded.
+Open `http://127.0.0.1:4173/`. In another terminal, run `npm run check:browser`. Set `CHROME_BIN` if Chrome is not on the default path. The browser check writes its rendered DOM and receipt to `browser-check/`. Without `CHECK_REFERENCE`, the gate renders every active shipment reference from `data/shipments.json` (currently `MV-4821` and `MV-6158`) and fails if any of them does not return its route. The hosted workflow still accepts one constrained `MV-4821` or `MV-6158` reference input.
 
 ## Release and incident workflow
 
